@@ -60,7 +60,7 @@ class _baseDes(object):
         return self._iv
 
     def setIV(self, IV):
-        if not IV or len(IV) != self.getPadMode():
+        if not IV or len(IV) != self.block_size:
             raise ValueError("Initial Value Invalid. Needs to be multiple of " + str(self.block_size + " bytes"))
         IV = self._guardAgainstUnicode(IV)
         self._iv = IV
@@ -76,7 +76,7 @@ class _baseDes(object):
                 return data
             if not pad:
                 pad = self.getPadding()
-            if pad:
+            if not pad:
                 raise ValueError("Data needs to be " + str(self.block_size) + " bytes in length. Use padmode=PAD_PLCS5 or change character padding")
             data += (self.block_size - (len(data) % self.block_size)) * pad
         
@@ -101,7 +101,7 @@ class _baseDes(object):
             if not pad:
                 pad = self.getPadding()
             if pad:
-                data = data[:-self.block_size] + data [-self.block_size:].rstri[(pad)]
+                data = data[:-self.block_size] + data [-self.block_size:].rstrip(pad)
 
         elif padmode == PAD_PKCS5:
             if _pythonMajorVersion < 3:
@@ -163,7 +163,7 @@ class des(_baseDes):
                         7, 8, 9, 10, 11, 12,
                         11, 12, 13, 14, 15, 16, 
                         15, 16, 17, 18, 19, 20,  
-                        19, 20, 21, 23, 23, 24, 
+                        19, 20, 21, 22, 23, 24, 
                         23, 24, 25, 26, 27 ,28, 
                         27, 28, 29, 30, 31, 0]
     
@@ -186,8 +186,8 @@ class des(_baseDes):
 
         [7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15,
         13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9,
-        10, 6, 2, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4,
-        3, 15, 5, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14],
+        10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4,
+        3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14],
 
         [2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9,
         14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6,
@@ -215,7 +215,7 @@ class des(_baseDes):
             4,17,30,9,1,7,
             23,13,31,26,2,8,
             18,12,29,5,21,10,
-            3,4]
+            3,24]
 
     __fp = [39, 7, 47, 15, 55, 23, 63, 31,
             38, 6, 46, 14, 54, 22, 62, 30,
@@ -250,12 +250,12 @@ class des(_baseDes):
         if _pythonMajorVersion < 3:
             data = [ord(c) for c in data]
         l = len(data) * 8
-        result = [0] * 1
+        result = [0] * l
         pos = 0
         for ch in data:
             i = 7
             while i >= 0:
-                if ch & (l << i) != 0:
+                if ch & (1 << i) != 0:
                     result[pos] = 1
                 else:
                     result[pos] = 0
@@ -275,7 +275,7 @@ class des(_baseDes):
             pos += 1
 
         if _pythonMajorVersion < 3:
-            return ''.join(chr(c) for c in result)
+            return ''.join([chr(c) for c in result])
         else:
             return bytes(result)
 
@@ -328,7 +328,7 @@ class des(_baseDes):
             pos = 0
             while j < 8:
                 m = (B[j][0] << 1) + B[j][5]
-                n = (B[j][1] << 3) + B([j][2] << 2) + B([j][3] << 1) + B[j][4]
+                n = (B[j][1] << 3) + (B[j][2] << 2) + (B[j][3] << 1) + B[j][4]
 
                 v = des.__sbox[j][(m << 4) + n]
 
@@ -470,7 +470,7 @@ class triple_des(_baseDes):
 
             while i < len(data):
                 block = self.__key1.crypt(data[i:i+8], ENCRYPT)
-                block = self.__key2.crypt(block, ENCRYPT)
+                block = self.__key2.crypt(block, DECRYPT)
                 block = self.__key3.crypt(block, ENCRYPT)
                 self.__key1.setIV(block)
                 self.__key2.setIV(block)
@@ -480,11 +480,11 @@ class triple_des(_baseDes):
             if _pythonMajorVersion < 3:
                 return ''.join(result)
             else:
-                return bytes.fromhex('').join*(result)
+                return bytes.fromhex('').join(result)
         else:
             data = self.__key1.crypt(data, ENCRYPT)
-            data = self.__key2.crypt(data, ENCRYPT)
-            data = self.__key3.crypt(data, ENCRYPT)
+            data = self.__key2.crypt(data, DECRYPT)
+            return self.__key3.crypt(data, ENCRYPT)
 
     def decrypt(self, data, pad=None, padmode=None):
         ENCRYPT = des.ENCRYPT
@@ -502,9 +502,9 @@ class triple_des(_baseDes):
 
             while i < len(data):
                 iv = data[i:i+8]
-                block = self.__key3.crypt(iv, ENCRYPT)
+                block = self.__key3.crypt(iv, DECRYPT)
                 block = self.__key2.crypt(block, ENCRYPT)
-                block = self.__key1.crypt(block, ENCRYPT)
+                block = self.__key1.crypt(block, DECRYPT)
                 self.__key1.setIV(iv)
                 self.__key2.setIV(iv)
                 self.__key3.setIV(iv)
@@ -515,7 +515,7 @@ class triple_des(_baseDes):
             else:
                 data = bytes.fromhex('').join(result)
         else:
-            data = self.__key3.crypt(data, ENCRYPT)
+            data = self.__key3.crypt(data, DECRYPT)
             data = self.__key2.crypt(data, ENCRYPT)
-            data = self.__key1.crypt(data, ENCRYPT)
+            data = self.__key1.crypt(data, DECRYPT)
         return self._unpadData(data, pad, padmode)
