@@ -11,7 +11,6 @@ def main():
     print(dataframe)
     k = triple_des("DESCRYPTDESCRY--", ECB, pad=None, padmode=PAD_PKCS5)
     aes_sub_key = key_expansion("1234567890123456")
-    cphr = []
     tot_enc_aes = []
     tot_dec_aes = []
     tot_enc_des = []
