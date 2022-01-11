@@ -2,7 +2,7 @@
 import math
 import numpy
 import time
-import ctxtime as ctx
+import rsa_algo.ctxtime as ctx
 
 # 100 digit prime numbers
 P100 =  20747222467734852078_21695222107608587480_99647472111729275299_25899121966847505496_58310084416732550077

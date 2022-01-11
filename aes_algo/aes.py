@@ -10,6 +10,8 @@
 # * Requires numpy
 import galois
 import numpy as np
+from aes_algo.tools import *
+# from aes_algo.tools import *
 GF8 = galois.GF(2 ** 8)
 
 
@@ -96,7 +98,6 @@ def shift_left(data_vector, k):
 def shift_right(data_vector, k):
     return data_vector[-k:] + data_vector[:-k]
 
-from tools import *
 class KeyState:
 
     def __init__(self, key_str: str):
@@ -193,7 +194,7 @@ def input_guard(txt):
     if len(txt) == 0:
         return False
     # input must consist of printable ascii characters
-    printable_ascii_range = (0x20, 0x7e)
+    printable_ascii_range = (0x01, 0xff)
     for char in txt:
         if (ord(char) < printable_ascii_range[0])\
                 or (ord(char) > printable_ascii_range[1]):
