@@ -2,7 +2,23 @@
 import math
 import numpy
 import time
-import rsa_algo.ctxtime as ctx
+if __name__ == '__main__':
+    import ctxtime as ctx
+else:
+    import rsa_algo.ctxtime as ctx
+import random as rd
+
+# 10 digit prime numbers
+P10 = 5915587277
+Q10 = 1500450271
+
+# 20 digit prime numbers
+P20 = 48112959837082048697
+Q20 = 54673257461630679457
+
+# 30 digit prime numbers
+P30 = 521419622856657689423872613771
+Q30 = 362736035870515331128527330659
 
 # 100 digit prime numbers
 P100 =  20747222467734852078_21695222107608587480_99647472111729275299_25899121966847505496_58310084416732550077
@@ -40,7 +56,7 @@ def mod_power(a, n, m):
         if n & 1 == 1:
             r = (r * a) % m
         a = (a * a) % m
-        n >>= 1 
+        n >>= 1
     return r
 
 def encrypt_char(i, e, n):
@@ -59,6 +75,7 @@ def get_encryption_key(phi, n):
     """
     returns the encryption key
     """
+    # for i in range(math.floor(math.sqrt(phi)) - 1, 2, -1):
     for i in range(2, phi, 1):
         if (math.gcd(i, n) == 1) \
                 and (math.gcd(i, phi) == 1):
@@ -110,7 +127,7 @@ def encrypt_string(txt: str, e: int, n: int):
     return [encrypt_char(ord(c), e, n) for c in txt]
 
 def decrypt_string(cipher: list, d: int, n: int):
-    return "".join([chr(decrypt_char(i, d, n)) for i in cipher])
+    return "".join(chr(decrypt_char(i, d, n)) for i in cipher)
 
 def test():
     # enc_key is the public key
@@ -139,7 +156,7 @@ def test():
 
 
 def main():
-    enc_key, dec_key = gen_key(P100, Q100)
+    enc_key, dec_key = gen_key(P10, Q10)
     print(f"{enc_key = }")
     print(f"{dec_key = }")
     sm = "Hello123!;.\na123"
