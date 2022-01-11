@@ -118,7 +118,7 @@ def gen_key(p = 2, q = 7):
 
     # This is the private key
     d = get_decryption_key(e, phi)
-    print(f"{(e * d) % phi = }")
+    # print(f"{(e * d) % phi = }")
     return ((e, n), (d, n))
 
 def encrypt_string(txt: str, e: int, n: int):
