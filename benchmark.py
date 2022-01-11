@@ -3,6 +3,8 @@ from aes_algo.aes import *
 from rsa_algo.rsa import *
 import pandas as pd
 from time import perf_counter
+# for progress bar
+from tqdm import tqdm
 
 def main():
     dataframe = pd.read_csv('data.csv', header = 0, usecols=["password"]) # ISO-8859-1
@@ -16,9 +18,11 @@ def main():
     tot_dec_des = []
     tot_enc_rsa = []
     tot_dec_rsa = []
+    # Huge decryption key made RSA slow
     enc_key, dec_key = gen_key(P100, Q100)
-    # print(dataframe[:1])
-    for d in dataframe["password"][:1000]:
+
+    # using tqdm so we can easily see progress
+    for i, d in tqdm(enumerate(dataframe["password"][:10_000])):
         start = perf_counter()
         result = encrypt(str(d), aes_sub_key)
         tot_enc_aes.append(perf_counter() - start)
