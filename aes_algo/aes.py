@@ -10,8 +10,12 @@
 # * Requires numpy
 import galois
 import numpy as np
-from aes_algo.tools import *
-# from aes_algo.tools import *
+
+if __name__ == '__main__':
+    from tools import *
+else:
+    from aes_algo.tools import *
+# from tools import *
 GF8 = galois.GF(2 ** 8)
 
 
@@ -67,7 +71,9 @@ MIXER = [
     [0x03, 0x01, 0x01, 0x02]
 ]
 
-INV_MIXER = np.linalg.inv(GF8(MIXER))
+temp = np.linalg.inv(GF8(MIXER))
+INV_MIXER = [[int(i) for i in row] for row in temp]
+# print(INV_MIXER)
 
 def gen_hex_mat(txt: str):
     res = []
@@ -178,9 +184,9 @@ def unmix_column(mat1):
     res = [[0 for _ in range(KC)] for _ in range(KC)]
     for i in range(KC):
         for j in range(KC):
-            res[i][j] = opg(int(INV_MIXER[i][0]), mat1[0][j])
+            res[i][j] = opg(INV_MIXER[i][0], mat1[0][j])
             for k in range(1, KC):
-                res[i][j] ^= opg(int(INV_MIXER[i][k]), mat1[k][j])
+                res[i][j] ^= opg(INV_MIXER[i][k], mat1[k][j])
     return res
 
 def input_guard(txt):
