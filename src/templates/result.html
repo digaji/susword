@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}
+Susword - Result
+{% endblock %}
+
+{% block content %}
+<h1>AES encryption: {{results[0][0]}}</h1>
+<h1>AES decryption: {{results[0][1]}}</h1>
+<br/>
+<h1>DES encryption: {{results[1][0]}}</h1>
+<h1>DES decryption: {{results[1][1]}}</h1>
+<br/>
+<h1>RSA encryption: {{results[2][0]}}</h1>
+<h1>RSA decryption: {{results[2][1]}}</h1>
+
+{% endblock %}

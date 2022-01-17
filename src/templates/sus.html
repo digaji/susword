@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}
+Susword - Sus
+{% endblock %}
+
+{% block content %}
+<h1>Sus your passwords here!</h1>
+<br/>
+<form method="post">
+  <div class="form-group">
+    <label for="password">Passwords (comma separated)</label>
+    <input type="text" class="form-control" id="passwords" name="passwords" placeholder="Enter your passwords"/>
+  </div>
+  <br/>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}
