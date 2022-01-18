@@ -1,4 +1,4 @@
-# susword
+# Susword
 This is the greatest susword manager of All Time
 
 Susword is a project that allows you to test out different cryptography algorithms (DES, AES, RSA) and see which one is the most efficient between all of them.
@@ -11,7 +11,7 @@ Made By:
 
 ## Download
 
-.  Clone this peoject to your local machine
+1.  Clone this peoject to your local machine
 ```bash
 git clone https://github.com/digaji/susword.git
 cd susword
